@@ -3,10 +3,10 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-    <com.pili.pldroid.player.widget.PLVideoView
-        android:id="@+id/pl_video_view"
+    <com.leon.playercompare.VideoView
+        android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.pili.pldroid.player.widget.PLVideoView>
+    </com.leon.playercompare.VideoView>
 
 </FrameLayout>

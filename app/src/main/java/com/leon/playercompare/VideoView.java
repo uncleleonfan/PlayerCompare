@@ -1,7 +1,6 @@
 package com.leon.playercompare;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -9,21 +8,29 @@ import android.view.SurfaceView;
 
 import java.io.IOException;
 
-import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
-public class VideoView extends SurfaceView implements IjkMediaPlayer.OnPreparedListener,
-        IjkMediaPlayer.OnErrorListener,
-        IjkMediaPlayer.OnCompletionListener,
-        IjkMediaPlayer.OnInfoListener{
+public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedListener,
+        IMediaPlayer.OnErrorListener,
+        IMediaPlayer.OnCompletionListener,
+        IMediaPlayer.OnInfoListener,
+        IMediaPlayer.OnVideoSizeChangeListener{
 
     private static final String TAG = "VideoView";
 
     private SurfaceHolder mSurfaceHolder;
 
-    private IjkMediaPlayer mIjkMediaPlayer;
-    private Uri mVideoUri;
+    private String mVideoPath = null;
 
+    private int mVideoWidth;
+    private int mVideoHeight;
+
+    public void setMediaPlayerProxy(IMediaPlayerProxy mediaPlayerProxy) {
+        mMediaPlayerProxy = mediaPlayerProxy;
+    }
+
+    private IMediaPlayerProxy mMediaPlayerProxy;
+
+    private IMediaPlayer mMediaPlayer;
 
     public VideoView(Context context) {
         this(context, null);
@@ -38,7 +45,71 @@ public class VideoView extends SurfaceView implements IjkMediaPlayer.OnPreparedL
         requestFocus();
     }
 
-    private final SurfaceHolder.Callback mCallback = new SurfaceHolder.Callback() {
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+        int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
+        int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
+        if (mVideoWidth > 0 && mVideoHeight > 0) {
+
+            int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+            int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+            int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+            int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+
+            if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
+                // the size is fixed
+                width = widthSpecSize;
+                height = heightSpecSize;
+
+                // for compatibility, we adjust size based on aspect ratio
+                if ( mVideoWidth * height  < width * mVideoHeight ) {
+                    //Log.i("@@@", "image too wide, correcting");
+                    width = height * mVideoWidth / mVideoHeight;
+                } else if ( mVideoWidth * height  > width * mVideoHeight ) {
+                    //Log.i("@@@", "image too tall, correcting");
+                    height = width * mVideoHeight / mVideoWidth;
+                }
+            } else if (widthSpecMode == MeasureSpec.EXACTLY) {
+                // only the width is fixed, adjust the height to match aspect ratio if possible
+                width = widthSpecSize;
+                height = width * mVideoHeight / mVideoWidth;
+                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    // couldn't match aspect ratio within the constraints
+                    height = heightSpecSize;
+                }
+            } else if (heightSpecMode == MeasureSpec.EXACTLY) {
+                // only the height is fixed, adjust the width to match aspect ratio if possible
+                height = heightSpecSize;
+                width = height * mVideoWidth / mVideoHeight;
+                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    // couldn't match aspect ratio within the constraints
+                    width = widthSpecSize;
+                }
+            } else {
+                // neither the width nor the height are fixed, try to use actual video size
+                width = mVideoWidth;
+                height = mVideoHeight;
+                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    // too tall, decrease both width and height
+                    height = heightSpecSize;
+                    width = height * mVideoWidth / mVideoHeight;
+                }
+                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    // too wide, decrease both width and height
+                    width = widthSpecSize;
+                    height = width * mVideoHeight / mVideoWidth;
+                }
+            }
+        } else {
+            // no size yet, just adopt the given spec sizes
+        }
+        setMeasuredDimension(width, height);
+    }
+
+
+    private SurfaceHolder.Callback mCallback = new SurfaceHolder.Callback() {
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
@@ -60,35 +131,29 @@ public class VideoView extends SurfaceView implements IjkMediaPlayer.OnPreparedL
     };
 
     public void setVideoPath(String path) {
-        setVideoUri(Uri.parse(path));
-    }
-
-
-    public void setVideoUri(Uri videoUri) {
-        mVideoUri = videoUri;
-
+        mVideoPath = path;
     }
 
     private void openVideo() {
-        if (mVideoUri == null) {
+        if (mVideoPath == null) {
             return;
         }
         release();
-        mIjkMediaPlayer = new IjkMediaPlayer();
-        mIjkMediaPlayer.setLogEnabled(BuildConfig.DEBUG);
-        //设置硬编码 自动旋转
-        mIjkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 1);
-        mIjkMediaPlayer.setOnPreparedListener(this);
-        mIjkMediaPlayer.setOnInfoListener(this);
-        mIjkMediaPlayer.setOnCompletionListener(this);
-        mIjkMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer = mMediaPlayerProxy.newInstance();
+        mMediaPlayer.setScreenOnWhilePlaying(true);
+        mMediaPlayer.setDisplay(mSurfaceHolder);
+        mMediaPlayer.setLogEnabled(BuildConfig.DEBUG);
+        mMediaPlayer.setOption();
+        mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnInfoListener(this);
+        mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setOnVideoSizeChangeListener(this);
 
         try {
-            mIjkMediaPlayer.setDisplay(mSurfaceHolder);
-            mIjkMediaPlayer.setDataSource(getContext(), mVideoUri);
-            mIjkMediaPlayer.setScreenOnWhilePlaying(true);
+            mMediaPlayer.setDataSource(mVideoPath);
             Log.d(TAG, "openVideo: start prepare");
-            mIjkMediaPlayer.prepareAsync();
+            mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,29 +165,39 @@ public class VideoView extends SurfaceView implements IjkMediaPlayer.OnPreparedL
         iMediaPlayer.start();
     }
 
-    @Override
-    public boolean onInfo(IMediaPlayer iMediaPlayer, int i, int i1) {
-        Log.d(TAG, "onInfo: " + i);
-        return false;
-    }
+
 
     @Override
     public void onCompletion(IMediaPlayer iMediaPlayer) {
 
     }
 
-    @Override
-    public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
-        Log.d(TAG, "onError: " + i);
-        return false;
-    }
 
     private void release() {
-        if (mIjkMediaPlayer != null) {
-            mIjkMediaPlayer.stop();
-            mIjkMediaPlayer.release();
-            mIjkMediaPlayer = null;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
+    @Override
+    public boolean onInfo(IMediaPlayer iMediaPlayer) {
+        return false;
+    }
+
+    @Override
+    public boolean onError(IMediaPlayer iMediaPlayer) {
+        return false;
+    }
+
+    @Override
+    public void onVideoSizeChange(IMediaPlayer iMediaPlayer, int width, int height) {
+        if (width != 0 && height != 0) {
+            mVideoWidth = width;
+            mVideoHeight = height;
+            getHolder().setFixedSize(width, height);
+            requestLayout();
+        }
+    }
 }
