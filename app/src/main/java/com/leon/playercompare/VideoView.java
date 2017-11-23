@@ -152,7 +152,9 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
 
         try {
             mMediaPlayer.setDataSource(mVideoPath);
-            Log.d(TAG, "openVideo: start prepare");
+
+            LogUtils.getInstance().init(getContext());
+            LogUtils.getInstance().onStartPrepare();
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,14 +164,16 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
     @Override
     public void onPrepared(IMediaPlayer iMediaPlayer) {
         Log.d(TAG, "onPrepared: ");
+        LogUtils.getInstance().onEndPrepare();
         iMediaPlayer.start();
+        LogUtils.getInstance().start();
     }
 
 
 
     @Override
     public void onCompletion(IMediaPlayer iMediaPlayer) {
-
+        LogUtils.getInstance().stop();
     }
 
 
