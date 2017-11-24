@@ -2,7 +2,10 @@ package com.leon.playercompare;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+
+import com.pili.pldroid.player.AVOptions;
 
 public class PLDroidPlayerActivity extends AppCompatActivity{
 
@@ -13,9 +16,16 @@ public class PLDroidPlayerActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pldroid);
+
+        ActionBar supportActionBar = getSupportActionBar();
+        supportActionBar.setTitle("PLDroidPlayer");
+
         mVideoView = findViewById(R.id.video_view);
-        mVideoView.setMediaPlayerProxy(new PLMediaPlayerProxy(this));
+        AVOptions avOptions = new AVOptions();
+        avOptions.setInteger(AVOptions.KEY_MEDIACODEC, AVOptions.MEDIA_CODEC_HW_DECODE);
+        mVideoView.setMediaPlayerProxy(new PLMediaPlayerProxy(this, avOptions));
         String path = "http://hc.yinyuetai.com/uploads/videos/common/2B40015FD4683805AAD2D7D35A80F606.mp4?sc=364e86c8a7f42de3&br=783&rd=Android";
+//        String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
         mVideoView.setVideoPath(path);
     }
 

@@ -24,8 +24,6 @@ public interface IMediaPlayer {
 
     void setLogEnabled(Boolean enable);
 
-    void setOption();
-
     void setOnPreparedListener(OnPreparedListener listener);
 
     void setOnInfoListener(OnInfoListener listener);
@@ -41,6 +39,8 @@ public interface IMediaPlayer {
     void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
 
     void setScreenOnWhilePlaying(Boolean enable);
+
+    void enableMediaCodec();
 
 
     interface OnInfoListener {

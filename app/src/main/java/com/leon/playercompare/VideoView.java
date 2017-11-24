@@ -143,12 +143,12 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
         mMediaPlayer.setScreenOnWhilePlaying(true);
         mMediaPlayer.setDisplay(mSurfaceHolder);
         mMediaPlayer.setLogEnabled(BuildConfig.DEBUG);
-        mMediaPlayer.setOption();
         mMediaPlayer.setOnPreparedListener(this);
         mMediaPlayer.setOnInfoListener(this);
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnErrorListener(this);
         mMediaPlayer.setOnVideoSizeChangeListener(this);
+        mMediaPlayer.enableMediaCodec();
 
         try {
             mMediaPlayer.setDataSource(mVideoPath);

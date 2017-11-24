@@ -39,6 +39,8 @@ public class LogUtils {
     private RandomAccessFile procStatFile;
     private RandomAccessFile appStatFile;
 
+    private OnUpdateLogListener mUpdateLogListener;
+
     private LogUtils(){}
 
     public static LogUtils getInstance() {
@@ -55,14 +57,19 @@ public class LogUtils {
 
     public void onStartPrepare() {
         startPrepare = System.currentTimeMillis();
-        Log.d(TAG, "onStartPrepare: " + startPrepare);
-
+        String msg = "onStartPrepare: " + startPrepare;
+        log(msg);
     }
+
+
 
     public void onEndPrepare() {
         endPrepare = System.currentTimeMillis();
-        Log.d(TAG, "onEndPrepare: " + endPrepare);
-        Log.d(TAG, "首开时间: endPrepare-startPrepare = " + (endPrepare - startPrepare));
+        String endPrepareMsg = "onEndPrepare: " + endPrepare;
+        log(endPrepareMsg);
+        String firstOpenMsg = "首开时间: endPrepare-startPrepare = " + (endPrepare - startPrepare);
+        log(firstOpenMsg);
+
 
     }
 
@@ -92,7 +99,9 @@ public class LogUtils {
             avgCpu = (avgCpu * (count -1) + cpu) / count;
             avgMem = (avgMem * (count - 1) + mem) / count;
 
-            Log.d(TAG, "CPU: " + cpu + "%" + " Memory: " + mem + "MB");
+            String sampleMsg = "CPU: " + cpu + "%" + " Memory: " + mem + "MB";
+            log(sampleMsg);
+
         }
     }
 
@@ -108,8 +117,9 @@ public class LogUtils {
 
     public void stop() {
         scheduler.shutdown();
-        Log.d(TAG, "stop: minCpu: " + minCpu + " maxCpu: " + maxCpu + " avgCpu:" + avgCpu
-                + " minMem: " + minMem + " maxMem: " + maxMem + " avgMem: " + avgMem);
+        String stopMsg = "stop: minCpu: " + minCpu + " maxCpu: " + maxCpu + " avgCpu:" + avgCpu
+                + " minMem: " + minMem + " maxMem: " + maxMem + " avgMem: " + avgMem;
+        log(stopMsg);
     }
 
     private float sampleCPU() {
@@ -162,4 +172,20 @@ public class LogUtils {
         return mem;
     }
 
+    public interface OnUpdateLogListener {
+
+        void onUpdate(long timestamp, String msg);
+    }
+
+
+    public void setOnUpdateLogListener(OnUpdateLogListener updateLogListener) {
+        mUpdateLogListener = updateLogListener;
+    }
+
+    private void log(String msg) {
+        Log.i(TAG, msg);
+        if (mUpdateLogListener != null) {
+            mUpdateLogListener.onUpdate(System.currentTimeMillis(), msg);
+        }
+    }
 }

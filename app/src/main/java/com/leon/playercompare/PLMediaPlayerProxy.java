@@ -16,7 +16,7 @@ public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
     private AVOptions mAvOptions;
 
     public PLMediaPlayerProxy(Context context) {
-        mContext = context;
+        this(context, null);
     }
 
     public PLMediaPlayerProxy(Context context, AVOptions avOptions) {
@@ -29,6 +29,11 @@ public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
     public IMediaPlayer newInstance() {
         mMediaPlayer = new PLMediaPlayer(mContext, mAvOptions);
         return this;
+    }
+
+    @Override
+    public void enableMediaCodec() {
+        //implement by Avoptions
     }
 
     @Override
@@ -71,9 +76,6 @@ public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
         mMediaPlayer.setDebugLoggingEnabled(enable);
     }
 
-    @Override
-    public void setOption() {
-    }
 
     @Override
     public void setOnPreparedListener(final OnPreparedListener listener) {
@@ -133,10 +135,12 @@ public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
 
     @Override
     public void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+        mMediaPlayer.setDataSource(uri.getPath());
     }
 
     @Override
     public void setScreenOnWhilePlaying(Boolean enable) {
         mMediaPlayer.setScreenOnWhilePlaying(enable);
     }
+
 }
