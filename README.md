@@ -566,7 +566,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 
 ### 总结 ###
-这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据可以推断：不管是软编码和硬编码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软编码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬编码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
+这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软编码和硬编码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软编码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬编码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
 
 
 
