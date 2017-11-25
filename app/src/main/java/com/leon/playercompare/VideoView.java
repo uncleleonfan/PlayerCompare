@@ -2,7 +2,6 @@ package com.leon.playercompare;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -163,10 +162,10 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
 
     @Override
     public void onPrepared(IMediaPlayer iMediaPlayer) {
-        Log.d(TAG, "onPrepared: ");
         LogUtils.getInstance().onEndPrepare();
         iMediaPlayer.start();
-        LogUtils.getInstance().start();
+//        LogUtils.getInstance().start();
+        LogUtils.getInstance().startForDuration(5);
     }
 
 

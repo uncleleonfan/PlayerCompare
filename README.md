@@ -205,7 +205,7 @@ PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，�
 	
 	}
 	
-	//IjkMediaPlayer代理
+	//IjkMediaPlayer代理，实现IMediaPlayer接口
 	public class IjkMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
 	
 		//声明一个IjkMediaPlayer对象
@@ -240,6 +240,7 @@ PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，�
 ### PLDroidPlayer的MediaPlayer代理 
 在使用PLMediaPlayer之前参考[官方文档]((https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk))集成PLDroidPlayer
 
+	//PLMediaPlayer代理，实现IMediaPlayer接口
 	public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
 
 		//定义PLMediaPlayer对象
@@ -250,7 +251,7 @@ PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，�
 	
 	    @Override
 	    public IMediaPlayer newInstance() {
-			//创建PLMediaPlayer对象
+			//创建PLDroidPlayer的PLMediaPlayer对象
 	        mMediaPlayer = new PLMediaPlayer(mContext, mAvOptions);
 	        return this;
 	    }
@@ -387,7 +388,122 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 	
 	}
 
-## 测试结果 ##
+## 测试 ##
+测试视频流是：
+	
+	//点播MP4视频
+	String path = "http://hc.yinyuetai.com/uploads/videos/common/2B40015FD4683805AAD2D7D35A80F606.mp4?sc=364e86c8a7f42de3&br=783&rd=Android";
+	//HLS直播流
+	String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
+
+
+在VieoView里MediaPlayer开始准备之前，初始化LogUtils并埋点记录MediaPlayer准备时间
+
+
+    try {
+		//设置视频源
+        mMediaPlayer.setDataSource(mVideoPath);
+		//初始化LogUtils
+        LogUtils.getInstance().init(getContext());
+		//记录开始准备时间
+        LogUtils.getInstance().onStartPrepare();
+        mMediaPlayer.prepareAsync();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+当MediaPlayer准备好后，会回调onPrePared，再次记录准备结束时间，这样，准备结束时间减去准备开始时间就是MediaPlayer准备耗时，即我们的首开时间。
+
+	//准备好后的回调
+    @Override
+    public void onPrepared(IMediaPlayer iMediaPlayer) {
+		//记录准备结束时间
+        LogUtils.getInstance().onEndPrepare();
+		//开始播放
+        iMediaPlayer.start();
+		//开始每隔1s采样，播放结束后停止采样，主要用于点播采样
+        LogUtils.getInstance().start();
+		
+		//开始每隔1s采样，采样5min,5min之后，自行停止，主要用于直播采样
+		//LogUtils.getInstance().startForDuration(5);
+    }
+
+	//播放结束
+    @Override
+    public void onCompletion(IMediaPlayer iMediaPlayer) {
+		//播放结束，停止采样
+        LogUtils.getInstance().stop();
+    }
+
+
+### 测试IjkPlayer ###
+创建一个IjkPlayerActivity使用IjkMediaPlayer来播放视频。
+	
+	public class IjkPlayerActivity extends AppCompatActivity{
+	
+	    @Override
+	    protected void onCreate(@Nullable Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        setContentView(R.layout.activity_ijkplayer);
+	
+	 
+	        //初始化IjkPlayer
+	        IjkMediaPlayer.loadLibrariesOnce(null);
+	        IjkMediaPlayer.native_profileBegin("libijkplayer.so");
+	
+	        VideoView videoView = findViewById(R.id.video_view);
+			//设置IjkMediaPlayer代理
+	        videoView.setMediaPlayerProxy(new IjkMediaPlayerProxy());
+	        String path = "视频url"
+			//设置视频url
+	        videoView.setVideoPath(path);
+	    }
+	
+	
+	    @Override
+	    protected void onStop() {
+	        super.onStop();
+			//通知IjkMediaPlayer结束
+	        IjkMediaPlayer.native_profileEnd();
+	    }
+	
+	}
+另外，在VideoView初始化MediaPlayer时，可以调用enableMediaCodec()来开启IjkPlayer的硬解码：
+	 
+	private void openVideo() {
+			.......
+	        mMediaPlayer.enableMediaCodec();
+	 }
+### 测试PLDroidPlayer ###
+创建一个PLDroidPlayerActivity使用PLMediaPlayer来播放视频。
+
+	public class PLDroidPlayerActivity extends AppCompatActivity{
+	
+	    @Override
+	    protected void onCreate(@Nullable Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        setContentView(R.layout.activity_pldroid);
+	
+	        VideoView mVideoView = findViewById(R.id.video_view);
+	
+			//配置AVoptions来开启硬编码，默认为软编码
+	        AVOptions avOptions = new AVOptions();
+	        avOptions.setInteger(AVOptions.KEY_MEDIACODEC, AVOptions.MEDIA_CODEC_HW_DECODE);
+	
+	        mVideoView.setMediaPlayerProxy(new PLMediaPlayerProxy(this, avOptions));
+	        String path = "视频url";
+	        mVideoView.setVideoPath(path);
+	    }
+	
+	}
+
+
+
+
+
+
+
+
 
 
 

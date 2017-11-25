@@ -3,6 +3,7 @@ package com.leon.playercompare;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Debug;
+import android.os.Handler;
 import android.os.Process;
 import android.util.Log;
 
@@ -39,9 +40,13 @@ public class LogUtils {
     private RandomAccessFile procStatFile;
     private RandomAccessFile appStatFile;
 
+    private Handler mHandler;
+
     private OnUpdateLogListener mUpdateLogListener;
 
-    private LogUtils(){}
+    private LogUtils(){
+        mHandler = new Handler();
+    }
 
     public static LogUtils getInstance() {
         if (instance == null) {
@@ -69,7 +74,6 @@ public class LogUtils {
         log(endPrepareMsg);
         String firstOpenMsg = "首开时间: endPrepare-startPrepare = " + (endPrepare - startPrepare);
         log(firstOpenMsg);
-
 
     }
 
@@ -113,6 +117,16 @@ public class LogUtils {
 
     public void start() {
         scheduler.scheduleWithFixedDelay(new SampleTask(), 0L, 1000L, TimeUnit.MILLISECONDS);
+    }
+
+    public void startForDuration(long minutes) {
+        start();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+            }
+        }, minutes * 60 * 1000);
     }
 
     public void stop() {
