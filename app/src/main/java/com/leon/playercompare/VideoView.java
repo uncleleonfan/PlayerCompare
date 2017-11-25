@@ -147,7 +147,7 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnErrorListener(this);
         mMediaPlayer.setOnVideoSizeChangeListener(this);
-        mMediaPlayer.enableMediaCodec();
+//        mMediaPlayer.enableMediaCodec();
 
         try {
             mMediaPlayer.setDataSource(mVideoPath);

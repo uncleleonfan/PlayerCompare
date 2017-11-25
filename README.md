@@ -497,6 +497,36 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 	
 	}
 
+## 测试结果 ##
+
+* 机型：Moto G (2代)
+* 系统版本：5.1
+* 数据源：String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
+* 软硬编码：软编码
+* 采样时长：5min
+
+### IjkPlayer结果 ###
+* 首开时间：1559ms
+* CPU占比最小值:5.00%
+* CPU占比最大值:80.72%
+* 平均CPU占比：30.69%
+* 内存使用最小值：63.49MB
+* 内存使用最大值:114.92MB
+* 平均内存：110.19MB
+
+![](img/ijk_soft.jpg)
+
+
+### PLDroidPlayer结果 ###
+* 首开时间:198ms
+* CPU占比最小值:3.11%
+* CPU占比最大值:67.18%
+* 平均CPU占比：30.25%
+* 内存使用最小值：32.34MB
+* 内存使用最大值:93.47MB
+* 平均内存:87.41MB
+
+![](img/pl_soft.jpg)
 
 
 
