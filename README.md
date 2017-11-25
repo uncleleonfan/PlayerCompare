@@ -504,7 +504,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 * 机型：Moto G (2代)
 * 系统版本：5.1
 * 数据源：String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
-* 软硬编码：**软编码**
+* 软硬编码：**软解码**
 * 采样时长：5min
 
 > IjkPlayer结果
@@ -537,7 +537,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 * 机型：Moto G (2代)
 * 系统版本：5.1
 * 数据源：String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
-* 软硬编码：**硬编码**
+* 软硬编码：**硬解码**
 * 采样时长：5min
 
 > IjkPlayer结果
@@ -566,7 +566,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 
 ### 总结 ###
-这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软编码和硬编码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软编码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬编码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
+这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软解码和硬解码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软解码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬解码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
 
 
 
