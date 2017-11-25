@@ -1,0 +1,184 @@
+# Android视频直播播放器哪家强？ #
+最近几年，视频直播在应用市场热火朝天，同事基友见面，自己做的app里没有直播功能都不好意思跟人家打招呼，大大小小的公司前赴后继，纷纷扑向这个风口，希望能够飞一把，当然有的飞起来了，有的飞走了，有的还没起飞。面对这样庞大的市场需求，BAT不用说，都已搭起自己的云服务招徕顾客，七牛、金山等也不甘示弱，所以，直播这一块的技术和市场相对来说都已经比较成熟，这时候在应用中添加直播或点播功能，可能只需要一杯咖啡的时间。
+
+那么问题来了，我需要一个播放器来播放视频流，那该如何选择呢？除了原生的VideoView（VideoView表示臣妾做不到啊），还有一些播放器如Vitamio，B站开源的IjkPlayer等，当然各大直播云服务商也提供了自己的播放器。这里需要了解到的是各大服务商的播放器一般并没有跟其直播服务进行绑定，举个栗子，我使用七牛的播放器可以播放BAT的云服务传递过来的视频流，BAT的播放器也可以播放七牛传输的视频流。
+
+如何选择，我们可以通过拍脑袋或者随机数决定，当然，作为程序员，我们也可以用数据来说话。所以，我们接下来对一些播放器拆箱使用，进行数据分析和对比，看一看到底哪家强？
+
+## 基础 ##
+在进行对比之前，我们需要对直播相关的基础概念做一些简单介绍，如果对这一块比较熟悉的同学可以跳过。
+### 视频直播 ###
+视频直播就是视频数据从采集端（摄像头）通过网络实时推送到播放端（手机，电脑，电视等），我们最早接触到的视频直播可能就是电视直播了，但随着智能手机发展，移动直播兴起，它的视频采集端是手机，播放端通常也是手机。
+
+### 视频点播 ###
+视频点播就是一段已经录制好的视频数据，用户可以点击播放。由于是已经录制完成的视频数据，所以还可以控制播放进度。
+
+### 直播协议 ###
+直播协议常见的有三种：RTMP、Http-FLV和HLS。
+
+* RTMP: 基于TCP协议，由Adobe设计,将音视频数据切割成小的数据包在互联网上传输，延时3s以内，但拆包组包复杂，在海量并发情况下不稳定。由于不是基于Http协议，存在被防火墙墙掉的可能性。
+* Http-FLV：基于Http协议，由Adobe设计，在大块音视频数据头部添加标记信息，延时3s以内，海量并发稳定，手机浏览器支持不足。
+* HLS：基于Http协议，由Apple设计，将视频数据切分成片段（10s以内），由m3u8索引文件进行管理，高延时（10s到30s），手机浏览器支持较好，可通过网页转发直播链接。
+
+### 软编码和硬编码 ###
+音视频数据在互联网上传输之前，由于存在冗余数据，需要进行压缩编码，编码存在两种方式，一种是软编码一种是硬编码。
+
+* 软编码：使用CPU进行编码
+* 硬编码：使用非CPU进行编码，如GPU等
+
+### 软解码和硬解码 ###
+数据进行编码之后传输到播放端，就要进行解码，那么解码也有两种方式，一种是软解码一种是硬解码。
+
+* 软解码：使用CPU进行解码
+* 硬解码：使用非CPU进行解码
+
+### 直播业务逻辑 ###
+大部分的直播业务逻辑基本是相似的，以七牛为例：
+
+![](img/live.jpg)
+
+
+1. 采集端向业务服务器（如App的后台）请求推流（推送视频流）地址
+2. 业务服务器请求LiveNet(云服务)获取推流地址并转发给采集端，保存记录（如url，房间号等）
+3. 采集端获取到推流地址后，使用RTMP协议进行推流
+4. 播放端请求业务服务器获取拉流地址
+5. 播放端使用拉流地址获取视频流进行播放
+
+## IjkPlayer ##
+IjkPlayer是B站开源播放器，地址为：[https://github.com/Bilibili/ijkplayer](https://github.com/Bilibili/ijkplayer)，基于音视频编解码库FFmpeg，支持常用的直播协议。IjkPlayer只提供播放器引擎库，不提供UI界面，所以使用IjkPlayer时还需要对UI界面进行二次封装，不过Github上有一些基于ijkplayer二次开发的播放器，他们对UI界面做了比较好的封装。
+
+通过git命令：
+
+	git clone https://github.com/Bilibili/ijkplayer.git
+下载ijkplayer完整项目，然后使用Android Studio打开目录：ijkplayer\android\ijkplayer，这个是Android的Demo项目，运行之后，效果如下：
+
+![](img/demo2.jpg)![](img/demo1.jpg)
+
+
+
+
+但是，我们暂时还是无法播放示例视频列表当中的视频，还需要编译so库。在编译so库的过程中，躺坑躺到怀疑人生，跟大家分享一下，避免跟我一样踩坑。
+
+
+### Windows下编译IjkPlayer ###
+
+首先大家**最好不要在Windows环境下编译**，因为我使用的是Windows系统，所以没有多想，下载代码后安装Cygwin，然后在Cygwin中安装make,yasm，装完之后以为大功告成，开始在Cygwin的命令行中执行编译脚本，但执行时报错，因为sh脚本还需要转换成unix版本，于是在Cygwin中又装了个dos2unix，将ijkplayer中的所有的sh脚本全部转换了一遍，然后再执行脚本，在读取一个配置文件configure又出了问题，还是文件格式问题，所以可以预见即使解决了这个文件，后续可能还有一大堆的文件存在这样的问题，细思极恐，果断弃坑。
+
+### Ubuntu下编译IjkPlayer ###
+弃坑Windows后又在电脑的虚拟机上安装了Ubuntu系统，可是等在Ubuntu上面搭建完Android开发环境后，发现硬盘空间不足了，不要问我为什么空间不足，反正就是不足了，我能怎么办，我只能选择原谅自己咯。后来想到我原来的一台笔记本里面装了Ubuntu 16.04，于是擦擦上面的灰，开机启动。
+
+#### 搭建Android开发环境
+1.安装JDK
+
+	sudo add-apt-repository ppa:webupd8team/java
+	sudo apt-get update
+	sudo apt-get install oracle-java8-installer
+	sudo apt-get install oracle-java8-set-default
+
+	//在命令行中使用java -version，java, javac命令不报命令找不到，就算安装成功
+
+2.安装Android Studio
+
+去官网或者[国内站点](http://www.android-studio.org/)下载Linux版本的Android Studio，这里，我使用的是Android Studio3.0版本。下载完成后，将Android Studio解压到/opt目录，然后使用命令行执行Andorid Studio中的bin/studio.sh启动Android Studio，进入向导界面，向导界面最后确认去下载SDK。下载完成后SDK路径为/home/xxx（用户名）/Android/Sdk。
+
+3.下载NDK
+
+使用Android Studio下载完SDK后，不用创建项目，直接打开SDK Manager，在里面去下载NDK，下载完成之后存放在sdk目录下的ndk-bundle目录，但这里下载的NDK版本是比较新的版本16，而ijkplayer编译也是不支持的，因为在ijkplayer\android\contrib\tools中有个sh脚本会检查编译环境，其中有一段代码会检查NDK版本：
+	
+	case "$IJK_NDK_REL" in
+	    10e*)
+	        ........
+	        echo "IJK_NDK_REL=$IJK_NDK_REL"
+	        case "$IJK_NDK_REL" in
+	            11*|12*|13*|14*)
+	                if test -d ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.9
+	                then
+	                    echo "NDKr$IJK_NDK_REL detected"
+	                else
+	                    echo "You need the NDKr10e or later"
+	                    exit 1
+	                fi
+	            ;;
+	            *)
+	                echo "You need the NDKr10e or later"
+	                exit 1
+	            ;;
+	        esac
+	    ;;
+	esac
+可以看出来这里只支持10e,11,12,13,14,15,所以**ndk版本高了不行，低了也不行**，没办法，我们得去重新去[官网](https://developer.android.google.cn/ndk/downloads/index.html)下载低一点的版本，如r14b。
+
+4.配置SDK和NDK路径
+
+找到/home/leon(用户名)目录，使用快捷键Ctrl + H显示隐藏文件，找到.bashrc文件打开，配置自己的SDK和NDK路径例如：
+
+	export ANDROID_NDK=/home/leon/Android/andriod-ndk-r14b
+	export ANDROID_SDK=/home/leon/Android/Sdk
+	export PATH=$ANDROID_NDK:$ANDROID_SDK:$PATH
+
+配置完成后，重启命令行，输入ndk-build命令，如果不报命令行找不到，说明NDK环境变量配置成功。
+
+#### 编译IjkPlayer ####
+Android环境搭建好后，就可以参考官方文档着手手编译ijkplayer了。
+
+	sudo apt-get update
+	sudo apt-get install git //安装git
+	sudo apt-get install yasm //安装yasm
+
+	sudo dpkg-reconfigure dash  //在弹出提示框选择“否”来使用bash
+	
+	//下载ijkplayer到ijkplayer-android目录
+	git clone https://github.com/Bilibili/ijkplayer.git ijkplayer-android
+	cd ijkplayer-android 
+	
+	//使用默认配置
+	cd config
+	rm module.sh
+	ln -s module-lite.sh module.sh
+	
+	cd ..
+	cd android/contrib
+	./compile-ffmpeg.sh clean  //清理
+
+	cd ~/ijkplayer-android          //返回源码根目录
+	./init-android.sh               //主要是去下载ffmpeg
+	
+	cd android/contrib
+	./compile-ffmpeg.sh clean
+	./compile-ffmpeg.sh all         //编译ffmpeg，all是全部编译，需要等待一段时间
+	
+	cd ..                            //回到ijkplayer-android/android
+	./compile-ijk.sh all             //编译ijkplayer
+
+编译完成后，在android/ijkplayer目录下各个库模块当中找到生成的so库：
+
+![](img/so.png)
+
+既然so库已经生成，就可以使用Andorid Studio再次打开ijkplayer中的安卓示例项目（android/ijkplayer），运行后就可以播放示例视频了。这个带有so库的示例项目我已上传到Github，地址为[https://github.com/uncleleonfan/IjkplayerExample](https://github.com/uncleleonfan/IjkplayerExample),欢迎下载。
+
+![](img/demo3.jpg)
+
+## PLDroidPlayer##
+PLDroidPlayer 是七牛推出的一款适用于 Android 平台的播放器 SDK，采用全自研的跨平台播放内核，拥有丰富的功能和优异的性能，可高度定制化和二次开发。示例项目地址为：[https://github.com/pili-engineering/PLDroidPlayer](https://github.com/pili-engineering/PLDroidPlayer)。
+PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，不用自己创建SurfaceView和TextureView来播放视频。可参考官方[开发指南](https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk)集成即可。
+
+## 测试开发 ##
+为了保证测试的变量只是播放器引擎本身（这里暂时将播放器引擎简单的理解为各个播放器的MediaPlayer），我们定义一个公共的UI界面即VideoView来播放视频流，然后通过代理模式去代理不同的播放器引擎。我们这里主要测试播放器播放视频首开的时间，播放器播放视频过程中Cpu，内存的占用情况。测试项目地址为:[https://github.com/uncleleonfan/PlayerCompare](https://github.com/uncleleonfan/PlayerCompare),测试项目运行效果：
+
+![test.gif](img/test.gif)
+
+
+### VideoView ###
+
+
+
+
+
+
+
+## 测试结果 ##
+
+
+
+
+
