@@ -158,23 +158,234 @@ Android环境搭建好后，就可以参考官方文档着手手编译ijkplayer�
 
 ![](img/demo3.jpg)
 
-## PLDroidPlayer##
+## PLDroidPlayer ##
 PLDroidPlayer 是七牛推出的一款适用于 Android 平台的播放器 SDK，采用全自研的跨平台播放内核，拥有丰富的功能和优异的性能，可高度定制化和二次开发。示例项目地址为：[https://github.com/pili-engineering/PLDroidPlayer](https://github.com/pili-engineering/PLDroidPlayer)。
 PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，不用自己创建SurfaceView和TextureView来播放视频。可参考官方[开发指南](https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk)集成即可。
 
 ## 测试开发 ##
-为了保证测试的变量只是播放器引擎本身（这里暂时将播放器引擎简单的理解为各个播放器的MediaPlayer），我们定义一个公共的UI界面即VideoView来播放视频流，然后通过代理模式去代理不同的播放器引擎。我们这里主要测试播放器播放视频首开的时间，播放器播放视频过程中Cpu，内存的占用情况。测试项目地址为:[https://github.com/uncleleonfan/PlayerCompare](https://github.com/uncleleonfan/PlayerCompare),测试项目运行效果：
+为了保证测试的变量只是播放器引擎本身（这里暂时将播放器引擎简单的理解为各个播放器的MediaPlayer），我们定义一个公共的UI界面即VideoView来播放视频流，然后通过代理模式去代理不同的播放器引擎。这样VideoView在播放视频时，可以通过代理使用不同的播放引擎（MediaPlayer）来播放。我们这里主要测试播放器播放视频首开的时间，播放器播放视频过程中Cpu，内存的占用情况。测试项目地址为:[https://github.com/uncleleonfan/PlayerCompare](https://github.com/uncleleonfan/PlayerCompare),测试项目运行效果：
 
 ![test.gif](img/test.gif)
 
 
-### VideoView ###
+### IMediaPlayer ###
+定义统一的MediaPlayer接口。
+
+	public interface IMediaPlayer {
+	
+	    void prepareAsync() throws IllegalStateException;
+	
+	    void start() throws IllegalStateException;
+	
+	    void stop() throws IllegalStateException;
+	
+	    void pause() throws IllegalStateException;
+	
+	    void release();
+	
+	    void reset();
+
+		.......
+	}
+### IMeidaPlayerProxy ###
+定义MeidaPlayer的代理接口，所有MediaPlayer的代理必须实现newInstance接口创建MediaPlayer。
+
+	interface IMediaPlayerProxy {
+	    IMediaPlayer newInstance();
+	}
+
+### IjkPlayer的MediaPlayer的代理 ###
+在使用IjkPlayer之前需要添加依赖，并且将编译好的so库添加到项目中的jniLibs下。
+		
+	//添加ijkplayer依赖
+	dependencies {
+	    compile 'tv.danmaku.ijk.media:ijkplayer-java:0.8.4'
+	    compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.4'
+	    compile 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.4'
+	
+	}
+	
+	//IjkMediaPlayer代理
+	public class IjkMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
+	
+		//声明一个IjkMediaPlayer对象
+	    private IjkMediaPlayer mIjkMediaPlayer;
+	
+	    @Override
+	    public IMediaPlayer newInstance() {
+            //创建IjkMeidaPlayer对象
+	        mIjkMediaPlayer = new IjkMediaPlayer();
+	        return this;
+	    }
+	
+	    @Override
+	    public void prepareAsync() throws IllegalStateException {
+	        mIjkMediaPlayer.prepareAsync();
+	    }
+	
+	    @Override
+	    public void start() throws IllegalStateException {
+	        mIjkMediaPlayer.start();
+	    }
+	
+	    @Override
+	    public void stop() throws IllegalStateException {
+	        mIjkMediaPlayer.stop();
+	    }
+		......
+	}
+	
 
 
+### PLDroidPlayer的MediaPlayer代理 
+在使用PLMediaPlayer之前参考[官方文档]((https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk))集成PLDroidPlayer
 
+	public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
 
+		//定义PLMediaPlayer对象
+	    private PLMediaPlayer mMediaPlayer;
+		//AVOptions为MediaPlayer的选项配置，例如可以配置开启硬解码
+	    private AVOptions mAvOptions;
+	
+	
+	    @Override
+	    public IMediaPlayer newInstance() {
+			//创建PLMediaPlayer对象
+	        mMediaPlayer = new PLMediaPlayer(mContext, mAvOptions);
+	        return this;
+	    }
+	
+	
+	    @Override
+	    public void prepareAsync() throws IllegalStateException {
+	        mMediaPlayer.prepareAsync();
+	    }
+	
+	    @Override
+	    public void start() throws IllegalStateException {
+	        mMediaPlayer.start();
+	    }
+	
+	    @Override
+	    public void stop() throws IllegalStateException {
+	        mMediaPlayer.stop();
+	    }
+	
+		........
+	}
 
+### VideoView
+VideoView仿照原生VideoView的实现，这里主要修改的是MediaPlayer的逻辑，方便配置使用不同播放器的MediaPlayer。
 
+	public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedListener,
+	        IMediaPlayer.OnErrorListener,
+	        IMediaPlayer.OnCompletionListener,
+	        IMediaPlayer.OnInfoListener,
+	        IMediaPlayer.OnVideoSizeChangeListener{
+
+		//定义MediaPlayer代理
+	    private IMediaPlayerProxy mMediaPlayerProxy;
+	
+		//定义VideoView使用的MediaPlayer
+	    private IMediaPlayer mMediaPlayer;
+	
+	
+		//设置MediaPlayer的代理
+	    public void setMediaPlayerProxy(IMediaPlayerProxy mediaPlayerProxy) {
+	        mMediaPlayerProxy = mediaPlayerProxy;
+	    }
+	  
+		//打开视频
+	    private void openVideo() {
+	        if (mVideoPath == null) {
+	            return;
+	        }
+	        release();
+			//使用代理创建对应的MediaPlayer对象
+	        mMediaPlayer = mMediaPlayerProxy.newInstance();
+	        mMediaPlayer.setScreenOnWhilePlaying(true);
+	        mMediaPlayer.setDisplay(mSurfaceHolder);
+	        mMediaPlayer.setLogEnabled(BuildConfig.DEBUG);
+	        mMediaPlayer.setOnPreparedListener(this);
+	        mMediaPlayer.setOnInfoListener(this);
+	        mMediaPlayer.setOnCompletionListener(this);
+	        mMediaPlayer.setOnErrorListener(this);
+	        mMediaPlayer.setOnVideoSizeChangeListener(this);
+	        try {
+	            mMediaPlayer.setDataSource(mVideoPath);
+				......
+	            mMediaPlayer.prepareAsync();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	
+	    @Override
+	    public void onPrepared(IMediaPlayer iMediaPlayer) {
+	        iMediaPlayer.start();//开始播放
+	    }
+	}
+
+### LogUtils ###
+LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor每隔1s采样一次数据。
+
+	
+	//开始采样
+    public void start() {
+        scheduler.scheduleWithFixedDelay(new SampleTask(), 0L, 1000L, TimeUnit.MILLISECONDS);
+    }
+	//停止采样
+    public void stop() {
+        scheduler.shutdown();
+    }
+
+	//采样任务
+	private class SampleTask implements Runnable {
+
+        @Override
+        public void run() {
+            float cpu = sampleCPU();//采样CPU使用
+            float mem = sampleMemory()；//采样内存使用
+        }
+    }
+
+### LogView ###
+打印Log的自定义控件，它有一个TextView和ScrollView组成，TextView在ScrollView用来内部来显示log,ScrollView用来滚动。
+
+	public class LogView extends RelativeLayout {
+	
+	    public LogView(@NonNull Context context, @Nullable AttributeSet attrs) {
+	        super(context, attrs);
+	        LayoutInflater.from(context).inflate(R.layout.view_log, this);
+	
+	        final TextView textView = findViewById(R.id.tv);
+	        final ScrollView scrollView = findViewById(R.id.scroll_view);
+	        final StringBuilder stringBuilder = new StringBuilder();
+			
+			//监听LogUtils的log
+	        LogUtils.getInstance().setOnUpdateLogListener(new LogUtils.OnUpdateLogListener() {
+	            @Override
+	            public void onUpdate(final long timestamp, final String msg) {
+					//在主线程刷新界面
+	                post(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                        String dateString = mSimpleDateFormat.format(new Date(timestamp));
+	                        String log = dateString + ": " + msg + "\n";
+							//添加一行log
+	                        stringBuilder.append(log);
+							//设置log显示
+	                        textView.setText(stringBuilder.toString());
+							//滚动ScrollView到底部
+	                        scrollView.fullScroll(View.FOCUS_DOWN);
+	                    }
+	                });
+	
+	            }
+	        });
+	    }
+	
+	}
 
 ## 测试结果 ##
 
