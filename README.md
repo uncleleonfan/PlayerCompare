@@ -578,9 +578,9 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 <table>
    <tr>
-      <td>平台  </td>
-      <td>IjkPlayer</td>
-      <td>PLDroidPlayer</td>
+      <th bgcolor="#32CD32">平台  </td>
+      <th bgcolor="#32CD32">IjkPlayer</td>
+      <th bgcolor="#32CD32">PLDroidPlayer</td>
    </tr>
    <tr>
       <td>版本 </td>
@@ -606,7 +606,9 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 </table>
 
 >注：
->1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。2.IjkPlayer至少需要用到两个包，分别是java包和armv7a包。3.IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
+>1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
+>2.IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
+>3.IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
 
 
 #### 功能点 ####
