@@ -571,14 +571,48 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 ### 总结 ###
 这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软解码和硬解码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软解码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬解码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
+#### 数据统计 ####
+<table>
+   <tr>
+      <td rowspan="2" bgcolor="#32CD32">软硬编码</td>
+      <td colspan="3" bgcolor="#32CD32">IjkPlayer</td>
+      <td colspan="3" bgcolor="#32CD32">PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td bgcolor="#32CD32">首开(ms)</td>
+      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
+      <td bgcolor="#32CD32">CPU min，avg,max(%)</td>
+      <td bgcolor="#32CD32">首开(ms)</td>
+      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
+      <td bgcolor="#32CD32">CPU min，avg,max(%)</td>
+   </tr>
+   <tr>
+      <td>软编码</td>
+      <td>1559</td>
+      <td>64.49,110.19,114.92</td>
+      <td>5.00,30.69,80.72</td>
+      <td>198</td>
+      <td>32.34,87.41,93.47</td>
+      <td>3.11,30.25,67.18</td>
+   </tr>
+   <tr>
+      <td>硬编码</td>
+      <td>2280</td>
+      <td>45.37,48.81,52.34</td>
+      <td>1.36,10.10,17.37</td>
+      <td>174</td>
+      <td>30.98,81.67,85.87</td>
+      <td>2.00,28.00,69.23</td>
+   </tr>
 
+</table>
 
 
 #### 包体 ####
 
 <table>
    <tr>
-      <th bgcolor="#32CD32">平台  </td>
+      <th bgcolor="#32CD32">对比点  </td>
       <th bgcolor="#32CD32">IjkPlayer</td>
       <th bgcolor="#32CD32">PLDroidPlayer</td>
    </tr>
@@ -607,12 +641,97 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 >注：
 >1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
->2.IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
->3.IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
+>2. IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
+>3. IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
 
 
 #### 功能点 ####
+这里只是对主要功能点进行对比，更多PLDroidPlayer功能点介绍可以查看[https://github.com/pili-engineering/PLDroidPlayer](https://github.com/pili-engineering/PLDroidPlayer)，而ijkPlayer并没有对其功能进行介绍：[https://github.com/Bilibili/ijkplayer](https://github.com/Bilibili/ijkplayer)
 
+<table>
+   <tr>
+      <th bgcolor="#32CD32">功能  </td>
+      <th bgcolor="#32CD32">IjkPlayer</td>
+      <th bgcolor="#32CD32">PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td>版本 </td>
+      <td>0.8.4</td>
+      <td>2.0.3</td>
+   </tr>
+   <tr>
+      <td>RTMP</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+   <tr>
+      <td>HLS</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+   <tr>
+      <td>HTTP-FLV</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+
+   <tr>
+      <td>HTTPS</td>
+      <td>支持(需要单独编译)</td>
+      <td>支持</td>
+   </tr>
+   <tr>
+      <td>硬解码</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+   <tr>
+      <td>是否需要编译</td>
+      <td>需要</td>
+      <td>不需要</td>
+   </tr>
+
+   <tr>
+      <td>播放控件</td>
+      <td>不提供</td>
+      <td>提供</td>
+   </tr>
+
+   <tr>
+      <td>UI定制</td>
+      <td>可以</td>
+      <td>可以</td>
+   </tr>
+
+   <tr>
+      <td>文档</td>
+      <td>不完善</td>
+      <td>完善</td>
+   </tr>
+
+   <tr>
+      <td>是否开源</td>
+      <td>开源</td>
+      <td>不开源</td>
+   </tr>
+
+   <tr>
+      <td>集成难度</td>
+      <td>略麻烦</td>
+      <td>容易</td>
+   </tr>
+
+   <tr>
+      <td>技术支持</td>
+      <td>无</td>
+      <td>有</td>
+   </tr>
+
+
+</table>
 
 
 
