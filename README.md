@@ -574,17 +574,17 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 #### 数据统计 ####
 <table>
    <tr>
-      <td rowspan="2" bgcolor="#32CD32">软硬编码</td>
-      <td colspan="3" bgcolor="#32CD32">IjkPlayer</td>
-      <td colspan="3" bgcolor="#32CD32">PLDroidPlayer</td>
+      <th rowspan="2" bgcolor="#32CD32">软硬编码</td>
+      <th colspan="3" bgcolor="#32CD32">IjkPlayer</td>
+      <th colspan="3" bgcolor="#32CD32">PLDroidPlayer</td>
    </tr>
    <tr>
       <td bgcolor="#32CD32">首开(ms)</td>
       <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
-      <td bgcolor="#32CD32">CPU min，avg,max(%)</td>
+      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
       <td bgcolor="#32CD32">首开(ms)</td>
       <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
-      <td bgcolor="#32CD32">CPU min，avg,max(%)</td>
+      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
    </tr>
    <tr>
       <td>软编码</td>
