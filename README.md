@@ -1,9 +1,176 @@
 # Android视频直播播放器哪家强？ #
-最近几年，视频直播在应用市场热火朝天，同事基友见面，自己做的app里没有直播功能都不好意思跟人家打招呼，大大小小的公司前赴后继，纷纷扑向这个风口，希望能够飞一把，当然有的飞起来了，有的飞走了，有的还没起飞。面对这样庞大的市场需求，BAT不用说，都已搭起自己的云服务招徕顾客，七牛、金山等也不甘示弱，所以，直播这一块的技术和市场相对来说都已经比较成熟，这时候在应用中添加直播或点播功能，可能只需要一杯咖啡的时间。
 
-那么问题来了，我需要一个播放器来播放视频流，那该如何选择呢？除了原生的VideoView（VideoView表示臣妾做不到啊），还有一些播放器如Vitamio，B站开源的IjkPlayer等，当然各大直播云服务商也提供了自己的播放器。这里需要了解到的是各大服务商的播放器一般并没有跟其直播服务进行绑定，举个栗子，我使用七牛的播放器可以播放BAT的云服务传递过来的视频流，BAT的播放器也可以播放七牛传输的视频流。
+最近在项目中要加入视频直播和点播功能，那么问题来了，我需要一个播放器来播放视频流，那该如何选择呢？除了原生的VideoView（VideoView表示臣妾做不到啊），还有一些播放器如Vitamio，B站开源的IjkPlayer等，当然各大直播云服务商也提供了自己的播放器。这里还需解到的是各大服务商的播放器一般并没有跟其直播服务进行绑定，举个栗子，我使用七牛的播放器可以播放BAT的云服务传递过来的视频流，BAT的播放器也可以播放七牛传输的视频流。
 
 如何选择，我们可以通过拍脑袋或者随机数决定，当然，作为程序员，我们也可以用数据来说话。所以，我们接下来对一些播放器拆箱使用，进行数据分析和对比，看一看到底哪家强？
+
+由于时间原因，暂时挑选了两个播放器进行测试，分别是IjkPlayer和七牛PLDroidPlayer，后续再加入其它播放器的测试。
+
+当然，这里只是做了几次数据采样，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软解码和硬解码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软解码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬解码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
+
+
+#### 数据统计 ####
+<table>
+   <tr>
+      <th rowspan="2" bgcolor="#32CD32">软硬编码</td>
+      <th colspan="3" bgcolor="#32CD32">IjkPlayer</td>
+      <th colspan="3" bgcolor="#32CD32">PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td bgcolor="#32CD32">首开(ms)</td>
+      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
+      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
+      <td bgcolor="#32CD32">首开(ms)</td>
+      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
+      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
+   </tr>
+   <tr>
+      <td>软编码</td>
+      <td>1559</td>
+      <td>64.49,110.19,114.92</td>
+      <td>5.00,30.69,80.72</td>
+      <td>198</td>
+      <td>32.34,87.41,93.47</td>
+      <td>3.11,30.25,67.18</td>
+   </tr>
+   <tr>
+      <td>硬编码</td>
+      <td>2280</td>
+      <td>45.37,48.81,52.34</td>
+      <td>1.36,10.10,17.37</td>
+      <td>174</td>
+      <td>30.98,81.67,85.87</td>
+      <td>2.00,28.00,69.23</td>
+   </tr>
+
+</table>
+
+
+#### 包体 ####
+
+<table>
+   <tr>
+      <th bgcolor="#32CD32">对比点  </td>
+      <th bgcolor="#32CD32">IjkPlayer</td>
+      <th bgcolor="#32CD32">PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td>版本 </td>
+      <td>0.8.4</td>
+      <td>2.0.3</td>
+   </tr>
+   <tr>
+      <td>jar/aar包</td>
+      <td>66KB(java) + 1342KB(armv7a)=1408KB</td>
+      <td>80KB</td>
+   </tr>
+   <tr>
+      <td>so库(armeabi-v7a,不带Https功能)</td>
+      <td>2.58MB</td>
+      <td>2.27MB</td>
+   </tr>
+   <tr>
+      <td>总计</td>
+      <td>3.96MB</td>
+      <td>2.35MB</td>
+   </tr>
+
+</table>
+
+>注：
+>1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
+>2. IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
+>3. IjkPlayer和PLDroid均可以支持Https，IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
+
+
+#### 功能点 ####
+这里只是对主要功能点进行对比，更多PLDroidPlayer功能点介绍可以查看[https://github.com/pili-engineering/PLDroidPlayer](https://github.com/pili-engineering/PLDroidPlayer)，而ijkPlayer并没有对其功能进行介绍：[https://github.com/Bilibili/ijkplayer](https://github.com/Bilibili/ijkplayer)
+
+<table>
+   <tr>
+      <th bgcolor="#32CD32">功能  </td>
+      <th bgcolor="#32CD32">IjkPlayer</td>
+      <th bgcolor="#32CD32">PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td>版本 </td>
+      <td>0.8.4</td>
+      <td>2.0.3</td>
+   </tr>
+   <tr>
+      <td>RTMP</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+   <tr>
+      <td>HLS</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+   <tr>
+      <td>HTTP-FLV</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+
+   <tr>
+      <td>HTTPS</td>
+      <td>支持(需要单独编译)</td>
+      <td>支持</td>
+   </tr>
+   <tr>
+      <td>硬解码</td>
+      <td>支持</td>
+      <td>支持</td>
+   </tr>
+
+   <tr>
+      <td>是否需要编译</td>
+      <td>需要</td>
+      <td>不需要</td>
+   </tr>
+
+   <tr>
+      <td>播放控件</td>
+      <td>不提供</td>
+      <td>提供</td>
+   </tr>
+
+   <tr>
+      <td>UI定制</td>
+      <td>可以</td>
+      <td>可以</td>
+   </tr>
+
+   <tr>
+      <td>文档</td>
+      <td>不完善</td>
+      <td>完善</td>
+   </tr>
+
+   <tr>
+      <td>是否开源</td>
+      <td>开源</td>
+      <td>不开源</td>
+   </tr>
+
+   <tr>
+      <td>集成难度</td>
+      <td>略麻烦</td>
+      <td>容易</td>
+   </tr>
+
+   <tr>
+      <td>技术支持</td>
+      <td>无</td>
+      <td>有</td>
+   </tr>
+
+
+</table>
+
 
 ## 基础 ##
 在进行对比之前，我们需要对直播相关的基础概念做一些简单介绍，如果对这一块比较熟悉的同学可以跳过。
@@ -567,172 +734,6 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 * 平均内存:81.67MB
 
 ![](img/pl_hard.jpg)
-
-
-### 总结 ###
-这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软解码和硬解码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软解码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬解码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
-#### 数据统计 ####
-<table>
-   <tr>
-      <th rowspan="2" bgcolor="#32CD32">软硬编码</td>
-      <th colspan="3" bgcolor="#32CD32">IjkPlayer</td>
-      <th colspan="3" bgcolor="#32CD32">PLDroidPlayer</td>
-   </tr>
-   <tr>
-      <td bgcolor="#32CD32">首开(ms)</td>
-      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
-      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
-      <td bgcolor="#32CD32">首开(ms)</td>
-      <td bgcolor="#32CD32">内存 min,avg,max(MB)</td>
-      <td bgcolor="#32CD32">CPU min,avg,max(%)</td>
-   </tr>
-   <tr>
-      <td>软编码</td>
-      <td>1559</td>
-      <td>64.49,110.19,114.92</td>
-      <td>5.00,30.69,80.72</td>
-      <td>198</td>
-      <td>32.34,87.41,93.47</td>
-      <td>3.11,30.25,67.18</td>
-   </tr>
-   <tr>
-      <td>硬编码</td>
-      <td>2280</td>
-      <td>45.37,48.81,52.34</td>
-      <td>1.36,10.10,17.37</td>
-      <td>174</td>
-      <td>30.98,81.67,85.87</td>
-      <td>2.00,28.00,69.23</td>
-   </tr>
-
-</table>
-
-
-#### 包体 ####
-
-<table>
-   <tr>
-      <th bgcolor="#32CD32">对比点  </td>
-      <th bgcolor="#32CD32">IjkPlayer</td>
-      <th bgcolor="#32CD32">PLDroidPlayer</td>
-   </tr>
-   <tr>
-      <td>版本 </td>
-      <td>0.8.4</td>
-      <td>2.0.3</td>
-   </tr>
-   <tr>
-      <td>jar/aar包</td>
-      <td>66KB(java) + 1342KB(armv7a)=1408KB</td>
-      <td>80KB</td>
-   </tr>
-   <tr>
-      <td>so库(armeabi-v7a,不带Https功能)</td>
-      <td>2.58MB</td>
-      <td>2.27MB</td>
-   </tr>
-   <tr>
-      <td>总计</td>
-      <td>3.96MB</td>
-      <td>2.35MB</td>
-   </tr>
-
-</table>
-
->注：
->1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
->2. IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
->3. IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
-
-
-#### 功能点 ####
-这里只是对主要功能点进行对比，更多PLDroidPlayer功能点介绍可以查看[https://github.com/pili-engineering/PLDroidPlayer](https://github.com/pili-engineering/PLDroidPlayer)，而ijkPlayer并没有对其功能进行介绍：[https://github.com/Bilibili/ijkplayer](https://github.com/Bilibili/ijkplayer)
-
-<table>
-   <tr>
-      <th bgcolor="#32CD32">功能  </td>
-      <th bgcolor="#32CD32">IjkPlayer</td>
-      <th bgcolor="#32CD32">PLDroidPlayer</td>
-   </tr>
-   <tr>
-      <td>版本 </td>
-      <td>0.8.4</td>
-      <td>2.0.3</td>
-   </tr>
-   <tr>
-      <td>RTMP</td>
-      <td>支持</td>
-      <td>支持</td>
-   </tr>
-   <tr>
-      <td>HLS</td>
-      <td>支持</td>
-      <td>支持</td>
-   </tr>
-
-   <tr>
-      <td>HTTP-FLV</td>
-      <td>支持</td>
-      <td>支持</td>
-   </tr>
-
-
-   <tr>
-      <td>HTTPS</td>
-      <td>支持(需要单独编译)</td>
-      <td>支持</td>
-   </tr>
-   <tr>
-      <td>硬解码</td>
-      <td>支持</td>
-      <td>支持</td>
-   </tr>
-
-   <tr>
-      <td>是否需要编译</td>
-      <td>需要</td>
-      <td>不需要</td>
-   </tr>
-
-   <tr>
-      <td>播放控件</td>
-      <td>不提供</td>
-      <td>提供</td>
-   </tr>
-
-   <tr>
-      <td>UI定制</td>
-      <td>可以</td>
-      <td>可以</td>
-   </tr>
-
-   <tr>
-      <td>文档</td>
-      <td>不完善</td>
-      <td>完善</td>
-   </tr>
-
-   <tr>
-      <td>是否开源</td>
-      <td>开源</td>
-      <td>不开源</td>
-   </tr>
-
-   <tr>
-      <td>集成难度</td>
-      <td>略麻烦</td>
-      <td>容易</td>
-   </tr>
-
-   <tr>
-      <td>技术支持</td>
-      <td>无</td>
-      <td>有</td>
-   </tr>
-
-
-</table>
-
 
 
 
