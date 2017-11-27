@@ -277,7 +277,7 @@ IjkPlayer是B站开源播放器，地址为：[https://github.com/Bilibili/ijkpl
 
 4.配置SDK和NDK路径
 
-找到/home/(用户名)/目录，使用快捷键Ctrl + H显示隐藏文件，找到.bashrc文件打开，配置自己的SDK和NDK路径例如：
+找到/home/(用户名)/目录，使用快捷键Ctrl + H显示隐藏文件，找到.bashrc文件打开，配置自己的SDK和NDK路径，例如：
 
 	export ANDROID_NDK=/home/leon/Android/andriod-ndk-r14b
 	export ANDROID_SDK=/home/leon/Android/Sdk
@@ -286,13 +286,13 @@ IjkPlayer是B站开源播放器，地址为：[https://github.com/Bilibili/ijkpl
 配置完成后，重启命令行，输入ndk-build命令，如果不报命令行找不到，说明NDK环境变量配置成功。
 
 #### 编译IjkPlayer ####
-Android环境搭建好后，就可以参考官方文档着手手编译ijkplayer了。
+Android环境搭建好后，就可以参考官方文档着手编译ijkplayer了。
 
 	sudo apt-get update
 	sudo apt-get install git //安装git
 	sudo apt-get install yasm //安装yasm
 
-	sudo dpkg-reconfigure dash  //在弹出提示框选择“否”来使用bash
+	sudo dpkg-reconfigure dash //在弹出提示框选择“否”来使用bash
 	
 	//下载ijkplayer到ijkplayer-android目录
 	git clone https://github.com/Bilibili/ijkplayer.git ijkplayer-android
@@ -305,17 +305,17 @@ Android环境搭建好后，就可以参考官方文档着手手编译ijkplayer�
 	
 	cd ..
 	cd android/contrib
-	./compile-ffmpeg.sh clean  //清理
+	./compile-ffmpeg.sh clean //清理
 
-	cd ~/ijkplayer-android          //返回源码根目录
-	./init-android.sh               //主要是去下载ffmpeg
+	cd ~/ijkplayer-android //返回源码根目录
+	./init-android.sh //主要是去下载ffmpeg
 	
 	cd android/contrib
 	./compile-ffmpeg.sh clean
-	./compile-ffmpeg.sh all         //编译ffmpeg，all是全部编译，需要等待一段时间
+	./compile-ffmpeg.sh all //编译ffmpeg，all是全部编译，需要等待一段时间
 	
-	cd ..                            //回到ijkplayer-android/android
-	./compile-ijk.sh all             //编译ijkplayer
+	cd .. //回到ijkplayer-android/android
+	./compile-ijk.sh all //编译ijkplayer
 
 编译完成后，在android/ijkplayer目录下各个库模块当中找到生成的so库：
 
@@ -512,13 +512,13 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
         @Override
         public void run() {
-            float cpu = sampleCPU();//采样CPU使用
-            float mem = sampleMemory()；//采样内存使用
+            float cpu = sampleCPU(); //采样CPU使用
+            float mem = sampleMemory(); //采样内存使用
         }
     }
 
 ### LogView ###
-打印Log的自定义控件，它有一个TextView和ScrollView组成，TextView在ScrollView用来内部来显示log，ScrollView用来滚动。
+LogView是打印Log的自定义控件，它由一个TextView和ScrollView组成，TextView在ScrollView内部，用来显示log，ScrollView用来滚动。
 
 	public class LogView extends RelativeLayout {
 	
@@ -564,7 +564,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 	String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
 
 
-在VieoView里MediaPlayer开始准备之前，初始化LogUtils并埋点记录MediaPlayer准备时间
+在VieoView中，MediaPlayer开始准备播放之前，初始化LogUtils，埋点记录MediaPlayer的准备时间。
 
 
     try {
@@ -579,7 +579,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
         e.printStackTrace();
     }
 
-当MediaPlayer准备好后，会回调onPrePared，再次记录准备结束时间，这样，准备结束时间减去准备开始时间就是MediaPlayer准备耗时，即我们的首开时间。
+当MediaPlayer准备好后，会回调onPrepared，再次记录准备结束时间，这样，准备结束时间减去准备开始时间就是MediaPlayer准备耗时，即我们的首开时间。
 
 	//准备好后的回调
     @Override
