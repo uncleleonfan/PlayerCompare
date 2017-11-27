@@ -506,6 +506,8 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 * 数据源：String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
 * 软硬编码：**软解码**
 * 采样时长：5min
+* IjkPlayer版本：0.8.4
+* PLDroid版本：2.0.3
 
 > IjkPlayer结果
 
@@ -539,6 +541,8 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 * 数据源：String path = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
 * 软硬编码：**硬解码**
 * 采样时长：5min
+* IjkPlayer版本：0.8.4
+* PLDroid版本：2.0.3
 
 > IjkPlayer结果
 
@@ -567,6 +571,45 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
 
 ### 总结 ###
 这里只是几次采样数据，需要结果更具说服力，可能还需要更多的测试条件和测试数据，不过我们可以从当前获取到的数据推断：不管是软解码和硬解码，PLDroidPlayer的首开速度都要远快于IjkPlayer；在软解码条件下，PLDroidPlayer的Cpu和内存消耗都要略低于IjkPlayer；在硬解码条件下，PLDroidPlayer的Cpu和内存消耗都要高于IjkPlayer。
+
+
+
+#### 包体 ####
+
+<table>
+   <tr>
+      <td>平台  </td>
+      <td>IjkPlayer</td>
+      <td>PLDroidPlayer</td>
+   </tr>
+   <tr>
+      <td>版本 </td>
+      <td>0.8.4</td>
+      <td>2.0.3</td>
+   </tr>
+   <tr>
+      <td>jar/aar包</td>
+      <td>66KB(java) + 1342KB(armv7a)=1408KB</td>
+      <td>80KB</td>
+   </tr>
+   <tr>
+      <td>so库(armeabi-v7a,不带Https功能)</td>
+      <td>2.58MB</td>
+      <td>2.27MB</td>
+   </tr>
+   <tr>
+      <td>总计</td>
+      <td>3.96MB</td>
+      <td>2.35MB</td>
+   </tr>
+
+</table>
+
+>注：
+>1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。2.IjkPlayer至少需要用到两个包，分别是java包和armv7a包。3.IjkPlayer和PLDroid均可以支持Https,IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
+
+
+#### 功能点 ####
 
 
 
