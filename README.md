@@ -78,7 +78,7 @@
 </table>
 
 >注：
->1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\用户名\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
+>1. IjkPlayer通过gradle下载下来为aar包，存放在目录C:\Users\\(用户名)\\.gradle\caches\modules-2\files-2.1\tv.danmaku.ijk.media。PLDroidPlayer为jar包。
 >2. IjkPlayer至少需要用到两个包，分别是java包和armv7a包。
 >3. IjkPlayer和PLDroid均可以支持Https，IjkPlayer需要单独编译，PLDroid只需添加libqcOpenSSL.so库即可。这里对比的是不带Https功能的。
 
@@ -273,11 +273,11 @@ IjkPlayer是B站开源播放器，地址为：[https://github.com/Bilibili/ijkpl
 	        esac
 	    ;;
 	esac
-可以看出来这里只支持10e,11,12,13,14,15,所以**ndk版本高了不行，低了也不行**，没办法，我们得去重新去[官网](https://developer.android.google.cn/ndk/downloads/index.html)下载低一点的版本，如r14b。
+可以看出来这里只支持10e，11，12，13,14，所以**ndk版本高了不行，低了也不行**，没办法，我们得去重新去[官网](https://developer.android.google.cn/ndk/downloads/index.html)下载低一点的版本，如r14b。
 
 4.配置SDK和NDK路径
 
-找到/home/leon(用户名)目录，使用快捷键Ctrl + H显示隐藏文件，找到.bashrc文件打开，配置自己的SDK和NDK路径例如：
+找到/home/(用户名)/目录，使用快捷键Ctrl + H显示隐藏文件，找到.bashrc文件打开，配置自己的SDK和NDK路径例如：
 
 	export ANDROID_NDK=/home/leon/Android/andriod-ndk-r14b
 	export ANDROID_SDK=/home/leon/Android/Sdk
@@ -518,7 +518,7 @@ LogUtils用于采样cpu和内存数据，里面使用ScheduledThreadPoolExecutor
     }
 
 ### LogView ###
-打印Log的自定义控件，它有一个TextView和ScrollView组成，TextView在ScrollView用来内部来显示log,ScrollView用来滚动。
+打印Log的自定义控件，它有一个TextView和ScrollView组成，TextView在ScrollView用来内部来显示log，ScrollView用来滚动。
 
 	public class LogView extends RelativeLayout {
 	
