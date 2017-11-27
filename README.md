@@ -321,7 +321,7 @@ Android环境搭建好后，就可以参考官方文档着手手编译ijkplayer�
 
 ![](img/so.png)
 
-既然so库已经生成，就可以使用Andorid Studio再次打开ijkplayer中的安卓示例项目（android/ijkplayer），运行后就可以播放示例视频了。这个带有so库的示例项目我已上传到Github，地址为[https://github.com/uncleleonfan/IjkplayerExample](https://github.com/uncleleonfan/IjkplayerExample),欢迎下载。
+既然so库已经生成，就可以使用Andorid Studio再次打开ijkplayer中的安卓示例项目（android/ijkplayer），运行后就可以播放示例视频了。这个带有so库的示例项目我已上传到Github，地址为[https://github.com/uncleleonfan/IjkplayerExample](https://github.com/uncleleonfan/IjkplayerExample)，欢迎下载。
 
 ![](img/demo3.jpg)
 
