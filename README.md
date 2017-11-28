@@ -400,7 +400,7 @@ PLDroidPlayer的集成要比ijkPlayer简单很多，不用自己编译so库，�
 
 
 ### PLDroidPlayer的MediaPlayer代理 
-在使用PLMediaPlayer之前参考[官方文档]((https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk))集成PLDroidPlayer
+在使用PLMediaPlayer之前参考[官方文档](https://developer.qiniu.com/pili/sdk/1210/the-android-client-sdk)集成PLDroidPlayer
 
 	//PLMediaPlayer代理，实现IMediaPlayer接口
 	public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
@@ -684,7 +684,8 @@ LogView是打印Log的自定义控件，它由一个TextView和ScrollView组成�
 ![](img/ijk_soft.jpg)
 
 
-### PLDroidPlayer结果 ###
+> PLDroidPlayer结果
+
 * 首开时间：198ms
 * CPU占比最小值：3.11%
 * CPU占比最大值：67.18%
@@ -719,7 +720,8 @@ LogView是打印Log的自定义控件，它由一个TextView和ScrollView组成�
 ![](img/ijk_hard.jpg)
 
 
-### PLDroidPlayer结果 ###
+> PLDroidPlayer结果
+
 * 首开时间：174ms
 * CPU占比最小值：2.00%
 * CPU占比最大值：69.23%
