@@ -59,6 +59,8 @@ public class PLMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
     @Override
     public void release() {
         mMediaPlayer.release();
+        mMediaPlayer = null;
+        mContext = null;
     }
 
     @Override

@@ -41,6 +41,7 @@ public class IjkMediaPlayerProxy implements IMediaPlayerProxy, IMediaPlayer {
     @Override
     public void release() {
         mIjkMediaPlayer.release();
+        mIjkMediaPlayer = null;
     }
 
     @Override
