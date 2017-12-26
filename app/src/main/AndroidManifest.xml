@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".IjkPlayerActivity"/>
         <activity android:name=".PLDroidPlayerActivity"/>
+        <activity android:name=".VitamioPlayerActivity"/>
 
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"

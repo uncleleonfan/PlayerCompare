@@ -23,4 +23,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+    public void onStartVitamioPlayer(View view) {
+        Intent intent = new Intent(this, VitamioPlayerActivity.class);
+        startActivity(intent);
+    }
 }

@@ -203,4 +203,10 @@ public class VideoView extends SurfaceView implements IMediaPlayer.OnPreparedLis
             requestLayout();
         }
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        release();
+    }
 }
